@@ -1,0 +1,38 @@
+
+[{
+    "stationID": "zty_0001",
+    "TYPE":"专题图",
+    "Station_Name":"专题图1",
+    "Lat":38,
+    "Lon":119,
+    "alt":100,
+    "count":2,
+    "path":"source/demo/top/",
+    "describe":"描述"
+   
+},
+{
+    "stationID": "zty_0002",
+    "TYPE":"专题图",
+    "Station_Name":"专题图2",
+    "Lat":35,
+    "Lon":119,
+    "alt":100,
+    "count":2,
+    "path":"source/demo/left/",
+    "describe":"描述"
+  
+},
+{
+    "stationID": "zty_0003",
+    "TYPE":"专题图",
+    "Station_Name":"专题图3",
+    "Lat":30,
+    "Lon":119,
+    "alt":100,
+    "count":3,
+    "path":"source/demo/bottom/",
+    "describe":"描述"
+    
+}
+]

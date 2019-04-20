@@ -1,0 +1,280 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Use correct character set. -->
+    <meta charset="utf-8">
+    <!-- Tell IE to use the latest, best version. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <title>秦岭生态监测服务展示系统</title>
+    <link rel="stylesheet" href="./css/layui.css">
+    <script src="./js/jquery-1.9.1.min.js"></script>
+    <link rel="stylesheet" href="./css/index.css">
+    <link rel="stylesheet" href="./css/swiper.min.css">
+    <link rel="stylesheet" href="./css/extra.css">
+
+    <script src="./js/cesium/Build/Cesium/Cesium.js"></script>
+    <!-- 适配相关 -->
+    <script src="./js/rem.js"></script>
+    <!-- 图表相关 -->
+    <script src="./js/echarts.js"></script>
+    <script src="./js/ajax.js"></script>
+    <script src="./js/layui.js"></script>
+    <script src="./js/layUse.js"></script>
+    
+ 
+    
+
+    <style>
+        @import url(./js/cesium/Build/Cesium/Widgets/widgets.css);
+
+        html {
+            min-width: 1366px !important;
+            overflow: auto;
+            position: relative;
+        }
+    
+    </style>
+    
+</head>
+
+<body>
+    
+    <div class="title">
+        <img src="./img/logo.png" alt="" style="margin-right:1rem">
+        秦岭生态监测服务系统
+    </div>
+    <div id="cesiumContainer"></div>
+
+    <div id="leftBox">
+        <!-- 地理环境 s -->
+        <div id="leftTree">
+            <div class="box_title">
+                地理环境
+            </div>
+            <div class="box_contain boxbox">
+                <div class="contain_title">
+                    <div class="city_ choseCity">选择省</div>
+                    <div class="city_">选择市</div>
+                    <div class="city_">选择县</div>
+                    <div class="city_">选择站点</div>
+                </div>
+                <div class="contain_city">
+                    <div class="hide_contain show_contain province">
+
+                    </div>
+                    <div class="hide_contain cityTab"></div>
+                    <div class="hide_contain countown"></div>
+                    <div class="hide_contain staion_"></div>
+                </div>
+            </div>
+        </div>
+        <!-- 地理环境 e -->
+        <div class="factSelect">
+            <!-- <img src="./img/box_bg3z.png" alt=""> -->
+            <!-- 基本气象数据 s-->
+            <div class="baseMeta">
+                <div class="box_title">
+                    基本气象数据
+                </div>
+                <div class="box_contain">
+                    <div class="baseMete_ featureSelec">
+                        <div class="featureSelec_1">
+                            <span
+                                style="display:inline-block;width:5px;height:12px;background:#FED037;margin-right:10px"></span>
+                            要素选择
+                        </div>
+                        <ul class="featureSelec_2">
+                            <li>
+                                温度
+                            </li>
+                            <li>
+                                雨量
+                            </li>
+                            <li>
+                                气压
+                            </li>
+                            <li>
+                                风向
+                            </li>
+                            <li>
+                                风速
+                            </li>
+                            <li>
+                                相对湿度
+                            </li>
+                            <li>
+                                能见度
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+            <!-- 基本气象数据 e-->
+            <!-- 农业生态要素 s-->
+            <div class="farm">
+                <div class="box_title">
+                    农业生态要素
+                </div>
+                <div class="box_contain">
+                    <div class="farm_ featureSelec">
+                        <div class="featureSelec_1">
+                            <span
+                                style="display:inline-block;width:5px;height:12px;background:#FED037;margin-right:10px"></span>
+                            要素选择
+                        </div>
+                        <ul class="featureSelec_2">
+                            <li>
+                                土壤相对湿度(多层)
+                            </li>
+                            <li>
+                                光照时长
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+            <!-- 农业生态要素 e-->
+            <!-- 空气环境因子 s-->
+            <!-- <div class="air">
+                <div class="box_title">
+                    空气环境因子
+                </div>
+                <div class="box_contain">
+                    <div class="air_ featureSelec">
+                        <div class="featureSelec_1">
+                            <span
+                                style="display:inline-block;width:5px;height:12px;background:#FED037;margin-right:10px"></span>
+                            要素选择
+                        </div>
+                        <ul class="featureSelec_2">
+                            <li>
+                                PM2.5浓度
+                            </li>
+                            <li>
+                                PM10浓度
+                            </li>
+                            <li>
+                                负氧离子
+                            </li>
+                            <li>
+                                二氧化碳
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div> -->
+             <!-- 空气环境因子 e-->
+        </div>
+       
+        <!-- 地面站，CMISS要素选择 -->
+        <div class="cmissChose">
+            <form class="layui-form" action="" >
+                <div class="layui-form-item" pane="">
+                    <div class="layui-input-block">
+                        <input type="checkbox" name="like1[write]" lay-skin="primary" title="地面站" checked="" lay-filter="filter">
+                        <input type="checkbox" name="like1[read]" lay-skin="primary" title="骨干站" lay-filter="filter">
+                        <input type="checkbox" name="like1[game]" lay-skin="primary" title="区域站" lay-filter="filter">
+                        <input type="checkbox" name="like1[game]" lay-skin="primary" title="负氧离子" lay-filter="filter">
+                        <input type="checkbox" name="like1[game]" lay-skin="primary" title="专题图" lay-filter="filter">
+                        <input type="checkbox" name="like1[game]" lay-skin="primary" title="群测群防点" lay-filter="filter">
+                    </div>
+                </div>
+            </form>
+        </div>
+
+
+        <!--  -->
+        <!-- 负氧离子站点 -->
+        <div class="negative">
+            <form class="layui-form" action="">
+                <div class="layui-form-item" pane="">
+                    <div class="layui-input-block radioSingle" >
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="rightBox">
+        <!-- 气温统计 s -->
+        <div class="temSum">
+            <div class="box_title">
+                气温统计
+            </div>
+            <div class="box_contain">
+                <div class="Collapse" onclick="collapse(0)">
+                    <img src="./img/collapse.png" alt=""> 收起</div>
+                <div class="tem_title">
+                    <span style="display:inline-block;width:3px;height:10px;background:#FED037"></span>
+                    <div>
+                        筛选条件
+                    </div>
+                    <div class="tem_btn">
+                        最高气温(°C)
+                    </div>
+                    <div class="tem_btn">
+                        最低气温(°C)
+                    </div>
+                    <div>2019-04-09</div>
+                </div>
+                <div class="tem_contain">
+                    
+                </div>
+            </div>
+        </div>
+        <!-- 气温统计 e -->
+        <!-- 负氧离子站 s -->
+        <div class="station">
+            <div class="box_title">
+                负氧离子站
+            </div>
+            <div class="box_contain">
+                    <div class="Collapse" onclick="collapse(1)">
+                            <img src="./img/collapse.png" alt=""> 收起</div>
+                <div id="oxygenEcharts"></div>
+            </div>
+        </div>
+        <!-- 负氧离子站 e -->
+        <!--  -->
+        <!-- 雨量流量关系图 s -->
+        <div class="rain">
+            <div class="box_title">
+                雨量流量关系图
+            </div>
+            <div class="box_contain">
+                    <div class="Collapse1" onclick="collapse(2)">
+                            <img src="./img/collapse.png" alt=""> 收起</div>
+                <div id="rain_echart"></div>
+            </div>
+        </div>
+        <!-- 负氧离子站 e -->
+    </div>
+    <div class="menuLogo" onclick="collapseShow1()">
+        <!-- <img src="./img/menu.png" alt=""> -->
+        <div>菜单</div>
+    </div>
+
+
+   
+</body>
+<!-- 页面相关 -->
+
+<!-- 地图相关 -->
+<script src="./js/map.js"></script>
+<!-- echarts相关 -->
+<script src="./js/index.js"></script>
+<script src="./js/setEcharts.js"></script>
+
+
+<!-- 弹窗轮播相关 -->
+<script src="./js/swiper.jquery.js"></script>
+<script src="./js/swiper.min.js"></script>
+
+
+</html>
