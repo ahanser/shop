@@ -338,6 +338,7 @@ body,
     border: 1px solid #246EA6;
     border-radius: 5px;
     color: white;
+    cursor: pointer;
 }
 
 .tem_dom {
@@ -508,7 +509,7 @@ body,
     margin: 0px;
     width: 47%;
     line-height: 25px;
-    
+   
 }
 
 .layui-form-checked[lay-skin=primary] .layui-icon-ok:before {
@@ -562,8 +563,8 @@ body,
 
 /* 地球信息框 */
 .myWindow {
-    width: 30rem;
-    height: 20rem;
+    width: 30.5rem;
+    height: 16.4rem;
     background: url('../img/box_bg2.png') 0 0 no-repeat;
     background-color: rgba(8, 17, 42, 0.7);
     background-size: 100% 100%;

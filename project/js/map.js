@@ -1,15 +1,17 @@
-var dataMock1;
+var dataMock1 =false;
 var satelliteParam;
+var s='http://192.168.1.80:801/'
 // var url = "http://192.168.5.36:8857/tile/service/v1/tile?map=2&x={x}&y={y}&z={z}";
 // new Cesium.UrlTemplateImageryProvider({url:url}),
 //地图背景
+//地图背景
 var viewer = new Cesium.Viewer('cesiumContainer', {
     imageryProvider: new Cesium.UrlTemplateImageryProvider({
-        url: 'http://192.168.5.36:8857/tile/service/v1/tile?map=2&x={x}&y={y}&z={z}',
+    url: 'http://192.168.1.80:8857/tile/service/v1/tile?map=2&x={x}&y={y}&z={z}',
     }),
-    //       imageryProvider:new Cesium.SingleTileImageryProvider({
-    //       url:"img/world.jpg",
-    //    }),
+    // imageryProvider:new Cesium.SingleTileImageryProvider({
+    // url:"img/world.jpg",
+    // }),
     timeline: false,
     baseLayerPicker: false,
     fullscreenButton: false,
@@ -22,8 +24,8 @@ var viewer = new Cesium.Viewer('cesiumContainer', {
     navigationHelpButton: false,
     animation: false,
     // skyAtmosphere:true,
-
-});
+    
+    });
 
 viewer.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(116.435314, 39.960521, 30000000.0), // 设置位置
@@ -108,7 +110,6 @@ function ContorlLabelShow_Hide() {
     handler.setInputAction(function (wheelment) {
 
         height = Math.ceil(viewer.camera.positionCartographic.height);
-        console.log(height)
         if (400000 > height) {
             // debugger
             RemoveDataSource('shanluo.json', true);
@@ -122,10 +123,39 @@ function ContorlLabelShow_Hide() {
 
     }, Cesium.ScreenSpaceEventType.WHEEL);
 
+
+    handler.setInputAction(function (movement) {
+        height = Math.ceil(viewer.camera.positionCartographic.height);
+   // if(dataMock1==true)
+    {
+        for (var temp of stationSelMap) {
+            if (temp[1] == true) {
+                var seldata = saveStationMap.get(temp[0]);
+                var lev = stationLev.get(temp[0]);
+                if (lev != null && lev != undefined)
+                    var num = ReturnBumber(height, lev)
+                 console.log(num)
+                if (seldata != null && seldata != undefined) {
+                    seldata.forEach(function (element, index, array) {
+                        if (index != undefined) {
+    
+                            CalDistance(element, index, num, lev);
+                        }
+                    });
+                }
+    
+            }
+        }
+    
+
+    }
+    
+    }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+
 }
 
 var arcgisNoteLayerProvider = new Cesium.ArcGisMapServerImageryProvider({
-    url: 'http://192.168.1.80:801/arcgis/rest/services/layer/qinling/MapServer'
+    url: s+'arcgis/rest/services/layer/qinling/MapServer'
 });
 //----------------------------------多图层控制
 var imageryLayers = viewer.imageryLayers;
@@ -171,14 +201,58 @@ $.getJSON("./json/zhuantitu.json", function (data) {
 })
 function getStaionLat() {
     // http://192.168.1.80:801/feature/getStationList?types=负氧离子
-    var sendData = {
-        types: ['地面站', '骨干站', '区域站', '负氧离子', '群测群防点']
+    var factorChose = document.getElementsByClassName('factorChose');
+    var feature;
+    for (let i = 0; i < factorChose.length; i++) {
+        switch (factorChose[i].innerText) {
+            case '温度':
+                feature = 'TEM';
+                break;
+
+            case '雨量':
+                feature = 'PRE_1h';
+                break;
+            case '气压':
+                feature = 'PRS';
+                break;
+            case '风向':
+                feature = 'WIN_D_Avg_10mi';
+                break;
+            case '风速':
+                feature = 'WIN_S_Avg_10mi';
+                break;
+            case '相对湿度':
+                feature = 'RHU';
+                break;
+            case '能见度':
+                feature = 'VIS_HOR_10MI';
+                break;
+            case '土壤相对湿度(多层)':
+                feature = 'SRHU';
+                break;
+            case '光照时长':
+                feature = 'SSH';
+                break;
+
+            default:
+                break;
+        }
+        if(feature){
+            break;
+        }
     }
-    Ajax('get', 'http://192.168.1.80:801/feature/getStationList', sendData, function (res) {
+    
+    var sendData = {
+        feature: feature
+    }
+    Ajax('get', s+'feature/getStationList', sendData, function (res) {
+  
         res = JSON.parse(res)
         if (res.returnCode == 200) {
             // console.log(res.data)
             saveStation = res.data
+            console.log(saveStation);
+            
             for (let i = 0; i < res.data.length; i++) {
                 addPoint(res.data[i])
                 if (saveStationMap.has(saveStation[i].TYPE)) {
@@ -197,15 +271,28 @@ function getStaionLat() {
         console.log(error);
     })
 }
-getStaionLat()
+//getStaionLat()
 
+
+function  upDate(item)
+{   
+    var obj = viewer.entities.getById(item.guid);
+    obj.label.text = data.Station_Name + "  " +data.item
+}
 function addPoint(data) {
+    var showtext;
     var guid = data['guid'] = Cesium.createGuid();
-    // console.log(guid)
     idArr.push(guid)
+    if(data.TYPE == '专题图'){
+        showtext =data.Station_Name;
+    }else{
+
+        showtext =data.Station_Name + "  " +data.RESULT;
+    }
     viewer.entities.add({
         id: guid,
         name: data.TYPE,
+        
         position: Cesium.Cartesian3.fromDegrees(data.Lon, data.Lat),
         show: data.TYPE == '地面站' ? true : false,
         //点样式
@@ -221,7 +308,7 @@ function addPoint(data) {
                 (data.TYPE == '骨干站' ?
                     'img/骨干站.png' :
                     (data.TYPE == '区域站' ?
-                        'img/qy.png' :
+                        'img/321.png' :
                         (data.TYPE == '群测群防点' ?
                             'img/qcqf.png' :
                             data.TYPE == '专题图' ? 'img/专题图.png' :
@@ -232,42 +319,76 @@ function addPoint(data) {
             scaleByDistance: new Cesium.NearFarScalar(1.5e2, 2.0, 1.5e7, 0.5)
         },
         //字体标签样式
+       
         label: {
-            text: data.Station_Name,
-
-            font: '18pt',
+            text:showtext,
+            font : '12pt sans-serif',
             color: Cesium.Color.RED,
             style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+            heightReference : Cesium.HeightReference.CLAMP_TO_GROUND,
+            horizontalOrigin : Cesium.HorizontalOrigin.LEFT,
+            verticalOrigin : Cesium.VerticalOrigin.BASELINE,
             outlineWidth: 1,
+            outlineColor :Cesium.Color.BLACK,
+            outlineWidth :3.0,
             //垂直位置
             //verticalOrigin : Cesium.VerticalOrigin.BUTTON,
             //中心位置
-            pixelOffset: new Cesium.Cartesian2(0, 20)
-        }
+            showBackground : false,
+            backgroundColor : new Cesium.Color(1, 1, 1, 1.0),
+            backgroundPadding : new Cesium.Cartesian2(8, 4),
+            disableDepthTestDistance : Number.POSITIVE_INFINITY // draws the label in front of terrain
+            }
+         
     });
 }
 // 站点选择事件
 function stationClick() {
 
 
+    // var baseDom = document.getElementsByClassName("cmissChose")[0];
+    // baseDom.addEventListener('click', function (e) {
+    //     console.log(e.target)
+    //     for (let j = 0; j < viewer.entities.values.length; j++) {
+    //         viewer.entities.values[j].show = false
+    //     }
+    //     var checkDom = document.getElementsByClassName('layui-form-checked');
+    //     for (let i = 0; i < checkDom.length; i++) {
+    //         console.log(checkDom[i].childNodes[0].innerText + i)
+    //         for (let j = 0; j < viewer.entities.values.length; j++) {
+    //             if (checkDom[i].childNodes[0].innerText == viewer.entities.values[j].name) {
+    //                 viewer.entities.values[j].show = true
+    //             }
+    //         }
+    //     }
+
+    //     console.log(viewer.entities)
+    // })
+
     var baseDom = document.getElementsByClassName("cmissChose")[0];
     baseDom.addEventListener('click', function (e) {
-        console.log(e.target)
-        for (let j = 0; j < viewer.entities.values.length; j++) {
-            viewer.entities.values[j].show = false
-        }
-        var checkDom = document.getElementsByClassName('layui-form-checked');
-        for (let i = 0; i < checkDom.length; i++) {
-            console.log(checkDom[i].childNodes[0].innerText + i)
-            for (let j = 0; j < viewer.entities.values.length; j++) {
-                if (checkDom[i].childNodes[0].innerText == viewer.entities.values[j].name) {
-                    viewer.entities.values[j].show = true
-                }
-            }
-        }
 
-        console.log(viewer.entities)
+        stationSelMap.forEach(function (element, index, array) {
+            array.set(index,false);
+        });
+
+         var checkDom=document.getElementsByClassName('layui-form-checked');
+         for(let i=0;i<checkDom.length;i++){
+             console.log(checkDom[i].childNodes[0].innerText+i)
+
+
+                    stationSelMap.forEach(function (element, index, array) {
+                        if(index==checkDom[i].childNodes[0].innerText)
+                        array.set(index,true);
+                    });
+         }
+            for(let j=0;j<viewer.entities.values.length;j++){                
+                    viewer.entities.values[j].show=stationSelMap.get(viewer.entities.values[j].name);
+
+            }
+
     })
+
 
 }
 stationClick()
@@ -308,6 +429,7 @@ handler.setInputAction(function (movement) {
                     </div>`;
             //专题图 切换成轮播图
             if (pick.id._name == '专题图') {
+                console.log(pick.id);
                 myWindow.innerHTML = ''
                 var text = ''
                 text += '<div class="swiper-container">'
@@ -325,16 +447,7 @@ handler.setInputAction(function (movement) {
                 text += '<div class="swiper-button-prev swiper-button-white"></div>'
                 text += '<div class="swiper-button-next swiper-button-white"></div>'
                 text += '</div>'
-                // myWindow.innerHTML=`<div class="swiper-container">
-                //     <div class="swiper-wrapper box">
-                //         <div class="swiper-slide swiper-lazy"> <img src="" alt=""></div>
-                //         <div class="swiper-slide swiper-lazy">slider2</div>
-                //         <div class="swiper-slide swiper-lazy">slider3</div>
-
-                //     </div>
-                //     <div class="swiper-button-prev swiper-button-white"></div>
-                //     <div class="swiper-button-next swiper-button-white"></div>
-                // </div>`;
+              
 
 
                 //swipe 初始化
@@ -355,21 +468,16 @@ handler.setInputAction(function (movement) {
             myWindow.style.position = 'absolute';
             myWindow.style.left = movement.position.x - 5 * 16 + 'px';
             myWindow.style.top = movement.position.y - 5 * 16 + 'px';
-            document.getElementsByTagName('body')[0].appendChild(myWindow);
+            if(myWindow){
+                document.getElementsByTagName('body')[0].appendChild(myWindow);
+            }
+         
             $('.myWindow').html(text);
-            $(".myWindow img").css("width", "100%").css("height", "100%")
-
+            $(".myWindow img").css("width", "100%").css("height", "20rem").css("display", "block")
             getswipe();
-            // $(".myWindow").mousedown(function(e){
-            //     $(document).bind("mousemove",function(e){
-            //         $(".myWindow").css("left",e.pageX).css("top",e.pageY)
-            //     });
-            // })
-            //     $(".myWindow").mouseup(function(){
-            //         $(document).unbind("mousemove")
-            //     })
+           
+            //鼠标拖动开始
             var dv = document.getElementsByClassName('myWindow')[0];
-
             var x = 0;
             var y = 0;
             var l = 0;
@@ -414,9 +522,6 @@ handler.setInputAction(function (movement) {
             break;
 
 
-            // myWindow = window.open('', '', 'width=200,height=100');
-            // myWindow.document.write("<p>This is 'myWindow'</p >");
-            // myWindow.moveTo(movement.position.x, movement.position.y);
         } else {
             var window = document.getElementsByClassName('myWindow');
             for (let i = 0; i < window.length; i++) {
@@ -451,40 +556,12 @@ function ReturnBumber(height, lev) {
         return 5
     }
     if (lev.high[5] < height) {
-        return 5
+        return 6
     }
 }
 
 
-handler.setInputAction(function (movement) {
-    // console.log(viewer.entities)
-    // for(let i=0;i<viewer.entities.values.length;i++){
-    //     CalDistance(viewer.entities.values[i])
-    // }
 
-    height = Math.ceil(viewer.camera.positionCartographic.height);
-
-    for (var temp of stationSelMap) {
-        if (temp[1] == true) {
-            var seldata = saveStationMap.get(temp[0]);
-            var lev = stationLev.get(temp[0]);
-            if (lev != null && lev != undefined)
-                var num = ReturnBumber(height, lev)
-            // console.log(num)
-            if (seldata != null && seldata != undefined) {
-                seldata.forEach(function (element, index, array) {
-                    if (index != undefined) {
-
-                        CalDistance(element, index, num, lev);
-                    }
-                });
-            }
-
-        }
-    }
-
-
-}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
 function CalDistance(item, index, num, lev) {
 
@@ -505,17 +582,46 @@ function CalDistance(item, index, num, lev) {
     height = Math.ceil(viewer.camera.positionCartographic.height);
     var dis = Cesium.Cartesian3.distance(cartesian, cartesian3);
     var obj = viewer.entities.getById(item.guid);
-    var number = lev.number[num]
-    if (index <= number) {
-        if (dis < lev.dis[num])//(clon<5 && clat<5)
-        {
-            obj.show = true;
+    var number = lev.number[num]  
+    if(num >=4)
+    {
+        if(obj._name=='地面站'){
+            obj._show = true;
+        }else{
+            obj._show = false;
         }
-        else
+    }else if(num==3){
+        if(item.TYPE=='骨干站'||'地面站'){
+            obj.show = true;
+        }else{
             obj.show = false;
-    } else {
-        obj.show = false;
+        }
+    }else{
+        if(item.TYPE=='骨干站'||'地面站'||'区域站'){
+            obj.show = true;
+        }else{
+            obj.show = false;
+        }
     }
+
+    
+    //  if(obj!=undefined){
+    //            // obj.show = true;
+    //      if (index < number) {
+    //         obj.show = true;
+    //             // if (dis < lev.dis[num])//(clon<5 && clat<5)
+    //             // {
+    //             //     obj.show = true;
+    //             // }
+    //             // else
+    //             //     obj.show = false;
+    //         } else {
+    //             obj.show = false;
+    //         }
+    //  }
+   
+
+    
 
 
 }

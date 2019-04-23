@@ -1,0 +1,20 @@
+{
+  "sourceFile": "北斗图标.max",
+  "gltfFiles": [
+    "地面站.gltf"
+  ],
+  "texFiles": {
+    "4FE11C6067209827A766A0438FAF7915": "4FE11C6067209827A766A0438FAF7915.bin",
+    "362DB79C1241198FE33C6E0F4225AED4": "通用_9米卫星天线.jpg"
+  },
+  "size": [
+    30.189,
+    33.44171,
+    3.189003
+  ],
+  "createTime": "2018-06-29 18:43:26",
+  "author": "",
+  "computer": "DHJP-20160602CF",
+  "max": "#(18000, 46, 0)",
+  "version": "1.9"
+}

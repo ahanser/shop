@@ -1,0 +1,183 @@
+{
+  "materials": [
+    {
+      "name": "21_-_Default",
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0,
+          "texCoord": 0
+        },
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.099999994,
+        "roughnessFactor": 1
+      },
+      "alphaMode": "OPAQUE"
+    }
+  ],
+  "images": [
+    {
+      "uri": "12B7CB622E7BA55E1232C0CE58532772.png"
+    }
+  ],
+  "textures": [
+    {
+      "name": "气象站2.png",
+      "sampler": 0,
+      "source": 0
+    }
+  ],
+  "meshes": [
+    {
+      "name": "卫星",
+      "primitives": [
+        {
+          "material": 0,
+          "mode": 4,
+          "indices": 0,
+          "attributes": {
+            "NORMAL": 2,
+            "POSITION": 1,
+            "TEXCOORD_0": 3
+          }
+        }
+      ]
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 1353688,
+      "uri": "26056BF79EEAC23795BD2648DD58E01A.bin"
+    }
+  ],
+  "nodes": [
+    {
+      "name": "RootNode",
+      "translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "children": [
+        1
+      ]
+    },
+    {
+      "name": "卫星",
+      "translation": [
+        0.110364079475403,
+        0.0,
+        -22.5830783843994
+      ],
+      "rotation": [
+        -0.70710676908493,
+        6.18172393274108E-08,
+        -6.18172393274108E-08,
+        0.70710676908493
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "mesh": 0
+    }
+  ],
+  "asset": {
+    "generator": "FBX2glTF",
+    "version": "2.0"
+  },
+  "scene": 0,
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 142104,
+      "byteOffset": 0,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 454344,
+      "byteOffset": 142104,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 454344,
+      "byteOffset": 596448,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 302896,
+      "byteOffset": 1050792,
+      "target": 34962
+    }
+  ],
+  "scenes": [
+    {
+      "name": "Root Scene",
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "accessors": [
+    {
+      "componentType": 5123,
+      "type": "SCALAR",
+      "count": 71052,
+      "bufferView": 0,
+      "byteOffset": 0
+    },
+    {
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 37862,
+      "bufferView": 1,
+      "byteOffset": 0,
+      "min": [
+        -0.875201880931854,
+        -0.511998176574707,
+        -1.19209289550781E-07
+      ],
+      "max": [
+        0.875201523303986,
+        0.51199746131897,
+        2.01046895980835
+      ]
+    },
+    {
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 37862,
+      "bufferView": 2,
+      "byteOffset": 0
+    },
+    {
+      "componentType": 5126,
+      "type": "VEC2",
+      "count": 37862,
+      "bufferView": 3,
+      "byteOffset": 0
+    }
+  ],
+  "samplers": [
+    {}
+  ]
+}

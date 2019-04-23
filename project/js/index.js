@@ -2,15 +2,19 @@
 var listenDom = document.getElementsByClassName('contain_title')[0];
 var saveTabName = [0, 0, 0, 0];
 var saveStaionName = '';
+var arrAdd = []
+var homePage = document.getElementsByClassName('homePage')[0];
+var menu = document.getElementsByClassName('menu')[0];
+var collapseArr = [];
+var s = 'http://192.168.1.80:801/'
+
+
+
+
+
 listenDom.addEventListener('click', function (e) {
-
     if (e.target.className == 'city_') {
-
         console.log(saveTabName)
-        // if (saveTabName == '' || saveTabName == '选择省') {
-        //     console.log('未选择省份')
-        //     return
-        // }
         var cityDom = document.getElementsByClassName("city_");
         var containDom = document.getElementsByClassName("hide_contain");
         for (let i = 0; i < cityDom.length; i++) {
@@ -34,9 +38,6 @@ listenDom.addEventListener('click', function (e) {
                 }
             }
         }
-
-
-
 
         for (let i = 0; i < cityDom.length; i++) {
 
@@ -66,9 +67,35 @@ listenDom.addEventListener('click', function (e) {
         // saveTabName = e.target.innerText;
     }
 })
-// 测试调用
-getCity('0', '')
+//
+menu.onmouseover = function () {
+    menu.style.cursor = 'pointer';
+}
+menu.onmouseout = function () {
+    menu.style.cursor = 'default';
+}
 
+$(".menu").click(function () {
+    $('.homePage').toggleClass('none')
+})
+
+homePage.onclick = function () {
+    viewer.camera.flyTo({
+        destination: Cesium.Cartesian3.fromDegrees(116.435314, 39.960521, 30000000.0), // 设置位置
+
+        orientation: {
+            heading: Cesium.Math.toRadians(20.0), // 方向
+            pitch: Cesium.Math.toRadians(-90.0), // 倾斜角度
+            roll: 0
+        }
+    });
+}
+
+
+
+
+
+getCity('0', '')
 function getCity(type, areaname) {
     var citydom_ = document.getElementsByClassName("province")[0];
     var citydom_1 = document.getElementsByClassName("cityTab")[0];
@@ -79,7 +106,7 @@ function getCity(type, areaname) {
         flag: type,
         areaName: areaname
     };
-    Ajax('get', 'http://192.168.1.80:801/feature/getProvinceList', sendData, function (res) {
+    Ajax('get', s + 'feature/getProvinceList', sendData, function (res) {
         var resData = JSON.parse(res);
         if (resData.returnCode == '200') {
             console.log(resData.data)
@@ -90,11 +117,12 @@ function getCity(type, areaname) {
                         var span1 = document.createElement('span');
                         span1.className = 'provinceName'
                         span1.innerText = resData.data[i].province
+                        span1.setAttribute('data-type', 0)
                         if (i % 5 == 0) {
                             div1 = document.createElement("div");
                         }
                         div1.appendChild(span1);
-                   
+
                         if (i % 5 == 0) {
                             citydom_.appendChild(div1)
                         }
@@ -111,6 +139,7 @@ function getCity(type, areaname) {
                         var span1 = document.createElement('span');
                         span1.className = 'cityName'
                         span1.innerText = resData.data[i].city
+                        span1.setAttribute('data-type', 1)
                         if (i % 5 == 0) {
                             div2 = document.createElement("div");
                         }
@@ -131,6 +160,7 @@ function getCity(type, areaname) {
                         var span1 = document.createElement('span');
                         span1.className = 'downTownName'
                         span1.innerText = resData.data[i].cnty
+                        span1.setAttribute('data-type', 2)
                         if (i % 5 == 0) {
                             div2 = document.createElement("div");
                         }
@@ -149,14 +179,15 @@ function getCity(type, areaname) {
 
                     citydom_3.innerHTML = '';
                     for (let i = 0; i < resData.data.length; i++) {
-                      
-                        
+
+
                         var span1 = document.createElement('span');
                         span1.className = 'statin_Name'
                         span1.innerText = resData.data[i].Station_Name;
                         span1.setAttribute('ids', resData.data[i].Station_ID_C)
-                        span1.setAttribute('lon',resData.data[i].Lon)
-                        span1.setAttribute('lat',resData.data[i].Lat)
+                        span1.setAttribute('lon', resData.data[i].Lon)
+                        span1.setAttribute('lat', resData.data[i].Lat)
+                        span1.setAttribute('data-type', 3)
                         if (i % 5 == 0) {
                             div2 = document.createElement("div");
                         }
@@ -226,7 +257,11 @@ function cityListen() { //市区选择事件
             saveTabName[0] = 1;
             saveTabName[1] = 1;
             saveTabName[2] = 1;
+
             document.getElementsByClassName('city_')[1].innerText = e.target.innerText; //修改tab头部省份数据
+            document.getElementsByClassName('city_')[2].innerText = "选择县"
+            document.getElementsByClassName('city_')[3].innerText = '选择区'
+
             // 
             var cityDom = document.getElementsByClassName("city_");
             var containDom = document.getElementsByClassName("hide_contain");
@@ -260,6 +295,7 @@ function downTownListen() { //县区选择事件
             saveTabName[3] = 1;
             document.getElementsByClassName('city_')[2].innerText = e.target.innerText; //修改tab头部省份数据
             // 
+            document.getElementsByClassName('city_')[3].innerText = '选择区'
             var cityDom = document.getElementsByClassName("city_");
             var containDom = document.getElementsByClassName("hide_contain");
 
@@ -295,26 +331,15 @@ function stationListen() { //站点选择事件
             saveTabName[3] = 1;
             document.getElementsByClassName('city_')[3].innerText = e.target.innerText; //修改tab头部省份数据
             saveStaionName = e.target.getAttribute('ids');
-            // 
-            // var cityDom = document.getElementsByClassName("city_");
-            // var containDom = document.getElementsByClassName("hide_contain");
 
-            // for (let i = 0; i < cityDom.length; i++) {
-            //     cityDom[i].className = 'city_';
-            //     containDom[i].className = 'hide_contain';
-            // }
-            // console.log(11)
-            // containDom[3].className = 'hide_contain show_contain staion_';
-            // cityDom[3].className = 'city_ choseCity';
-            // getCity('4', e.target.innerText)
         }
     })
 }
-function doubleListen() { //站点选择事件
+function doubleListen() { //站点双击事件
     var province = document.getElementsByClassName("staion_")[0];
     province.addEventListener('dblclick', function (e) {
         console.log(e.target)
-        if (e.target.className.indexOf('statin_Name') >=0) {
+        if (e.target.className.indexOf('statin_Name') >= 0) {
             for (let i = 0; i < document.getElementsByClassName('statin_Name').length; i++) {
                 document.getElementsByClassName('statin_Name')[i].className = 'statin_Name'
             }
@@ -331,20 +356,19 @@ function doubleListen() { //站点选择事件
             saveStaionlon = e.target.getAttribute('lon');
             saveStaionLat = e.target.getAttribute('lat');
             viewer.camera.flyTo({
-                destination : Cesium.Cartesian3.fromDegrees(saveStaionlon, saveStaionLat,1000000)
+                destination: Cesium.Cartesian3.fromDegrees(saveStaionlon, saveStaionLat, 1000000)
                 // orientation : {
                 //     heading: Cesium.Math.toRadians(20.0), // 方向
                 //     pitch: Cesium.Math.toRadians(-90.0), // 倾斜角度
                 //     roll: 0
                 // }
             });
-        }     
+        }
     })
 
 }
 
 
-var arrAdd=[]
 // 基本气象数据
 function baseMeteData() {
     var baseDom = document.getElementsByClassName("baseMete_")[0];
@@ -361,11 +385,11 @@ function baseMeteData() {
             if (e.target.className == 'factorChose') {
                 e.target.className = ''
             } else {
-                arrayElement(e.target)
                 // getBaseEchartsData()
                 // e.target.className='factorChose'
                 // getBaseEchartsData()
             }
+            arrayElement(e.target)
 
             console.log(e.target)
         }
@@ -390,9 +414,9 @@ function framBaseData() {
             } else {
                 // e.target.className='factorChose'
                 // getBaseEchartsData()
-                arrayElement(e.target)
-                
+
             }
+            arrayElement(e.target)
 
             console.log(e.target)
         }
@@ -401,15 +425,15 @@ function framBaseData() {
 }
 // 高亮两次限制
 
-function arrayElement(data){
+function arrayElement(data) {
     arrAdd.push(data);
-    if(arrAdd.length>2){
-        var prve=arrAdd.shift();
+    if (arrAdd.length > 1) {
+        var prve = arrAdd.shift();
         $(prve).removeClass("factorChose");
     }
-    for(let i=0;i<arrAdd.length;i++){
-        arrAdd[i].className='factorChose';
-        
+    for (let i = 0; i < arrAdd.length; i++) {
+        arrAdd[i].className = 'factorChose';
+
     }
     getBaseEchartsData()
 }
@@ -454,191 +478,114 @@ function getBaseEchartsData() {
                 break;
         }
     }
-    var LineObj = [];
-    var lineobjindex = 1;
-    Ajax('get', 'http://192.168.1.80:801/feature/getOneStationDetailByTimeRange', {
+
+    Ajax('get', s + 'feature/getOneStationDetailByTimeRange', {
         'stationId': saveStaionName,
         'features': arr,
         'days': 7
     }, function (res) {
-        
+
         res = JSON.parse(res)
         console.log(res)
         if (res.returnCode == '200') {
             option1.series = [];
             option1.xAxis[0].data = res.data.time;
-          
-            var data=[];
+
+            var data = [];
             var name;
-            var zzz=[];
+            var zzz = [];
             for (const key in res.data) {
-                
+
                 if (key == 'TEM') {
                     if (res.data.hasOwnProperty(key)) {
                         data.push(res.data[key]);
                         name = '温度'
-                        zzz.push(key)
+                        zzz.push(name)
                     }
                 } else if (key == 'time') {
                     continue
                 } else if (key == 'PRE_1h') {
                     if (res.data.hasOwnProperty(key)) {
-                        data.push(res.data[key]) ;
+                        data.push(res.data[key]);
                         name = '雨量'
-                        zzz.push(key)
+                        zzz.push(name)
                     }
-                } else if (key=='PRS'){
+                } else if (key == 'PRS') {
                     if (res.data.hasOwnProperty(key)) {
-                        data.push(res.data[key]) ;
+                        data.push(res.data[key]);
                         name = '气压'
-                        zzz.push(key)
+                        zzz.push(name)
                     }
-                }else if (key=='WIN_D_Avg_10mi'){
+                } else if (key == 'WIN_D_Avg_10mi') {
                     if (res.data.hasOwnProperty(key)) {
-                        data.push(res.data[key]) ;
+                        data.push(res.data[key]);
                         name = '风向'
-                        zzz.push(key)
+                        zzz.push(name)
                     }
-                }else if (key=='WIN_S_Avg_10mi'){
+                } else if (key == 'WIN_S_Avg_10mi') {
                     if (res.data.hasOwnProperty(key)) {
-                        data.push(res.data[key]) ;
+                        data.push(res.data[key]);
                         name = '风速'
-                        zzz.push(key)
+                        zzz.push(name)
                     }
-                }else if (key=='RHU'){
+                } else if (key == 'RHU') {
                     if (res.data.hasOwnProperty(key)) {
-                        data.push(res.data[key]) ;
+                        data.push(res.data[key]);
                         name = '相对湿度'
-                        zzz.push(key)
+                        zzz.push(name)
                     }
-                }else if (key=='VIS_HOR_10MI'){
+                } else if (key == 'VIS_HOR_10MI') {
                     if (res.data.hasOwnProperty(key)) {
-                        data.push(res.data[key]) ;
+                        data.push(res.data[key]);
                         name = '能见度'
-                        zzz.push(key)
+                        zzz.push(name)
                     }
-                }else if (key=='SRHU'){
+                } else if (key == 'SRHU') {
                     if (res.data.hasOwnProperty(key)) {
-                        data.push(res.data[key]) ;
+                        data.push(res.data[key]);
                         name = '土壤相对湿度(多层)'
-                        zzz.push(key)
+                        zzz.push(name)
                     }
-                }else if (key=='SSH'){
+                } else if (key == 'SSH') {
                     if (res.data.hasOwnProperty(key)) {
-                        data.push(res.data[key]) ;
+                        data.push(res.data[key]);
                         name = '光照时长'
-                        zzz.push(key)
+                        zzz.push(name)
                     }
                 }
                 console.log('=======================');
-               debugger
-                
-                // LineObj[lineobjindex]='';
-                // lineobjindex++;
-                // if(lineobjindex>=2)
-                // {
-                //     lineobjindex=0;
-                // }
-                
-                    // var obj = [{
-                    //     name: name,
-                    //     type: 'line',
-                    //     stack: '总量',
-                    //     label: {
-                    //         normal: {
-                    //             show: true,
-                    //             position: 'top'
-                    //         }1
-                    //     },
-                    //     lineStyle: {
-                    //         width: 3
-                    //     },
-                    //     data: data
-                    // },{
-                    //     name: 'cdhsi',
-                    //     type: 'line',
-                    //     stack: 'cdhsi',
-                    //     lineStyle: {
-                    //         width: 3
-                    //     },
-                    //     data: [100, 1000, 500, 1000, 700, 0, 200],
-                    //     yAxisIndex: 1
-                    // }];
-                        console.log(zzz);
-                        console.log(data);
-                        
 
-                   var obj=[{
-                         name: zzz[0],
-                         type: 'line',
-                         stack: '总量',
-                         label: {
-                             normal: {
-                                 show: true,
-                                position: 'top'
-                             }
-                         },
-                         lineStyle: {
-                             width: 3
-                         },
-                    data: data[0],
-                },
-                  {
-                    name: zzz[1],
-                      data: data[1],
-                      yAxisIndex: 1,
-                      type:'line',
-                      axisLabel: {
-                          textStyle: {
-                              color: '#ff3040', //坐标值得具体的颜色
-                
-                          }
-                      },
-                  }]
-                   
-                option1.series=obj;
+                //折线图Y轴数据
+                var obj = [
+                    {
+                        name: zzz[0],
+                        type: 'line',
+                        data: data[0],
+
+                        itemStyle: {
+                            normal: {
+                                lineStyle: {
+                                    color: '#ff3040'
+                                }
+                            }
+                        },
+                    },
+
+
+                ]
+                option1.series = obj;
             }
-            setTimeout(myChart1.setOption(option1),500);
+            myChart1.setOption(option1)
         }
     })
 }
 
-// 空气环境因子
-// function airEnvirData() {
-//     var baseDom = document.getElementsByClassName("air_")[0];
-//     baseDom.addEventListener('click', function (e) {
-//         console.log(saveTabName)
 
-//         if (e.target.nodeName.toLowerCase() == 'li') {
-//             if (saveTabName[3] == 0) {
-//                 layer.alert('当前未选择站点，请先选择站点再进行操作！', {
-//                     icon: 0
-//                 });
-//                 return
-//             }
-//             if (e.target.className == 'factorChose') {
-//                 e.target.className = ''
-//             } else {
-//                 e.target.className = 'factorChose'
-//             }
-
-//             console.log(e.target)
-//         }
-
-
-//         // layer.msg('大部分参数都是可以公用的<br>合理搭配，展示不一样的风格', {
-//         //     time: 20000, //20s后自动关闭
-//         //     btn: ['明白了', '知道了', '哦']
-//         // });
-//     })
-
-// }
 baseMeteData()
 framBaseData()
-// airEnvirData()
 
+//主页返回事件
 
-var collapseArr = [];
 // 图表收起事件
 function collapse(index) {
     // document.getElementsByClassName('menuLogo')[0].style.display = 'flex';
@@ -679,124 +626,36 @@ function collapseShow1() {
     }
     // document.getElementsByClassName('menuLogo')[0].style.display = 'none';
 }
-// 获取气温统计数据
-function getTempData(city) {
-    var sendData = {
-        cnty: city
-    }
-    Ajax('get', 'http://192.168.1.80:801/feature/searchCntyStationTem', sendData, function (res) {
 
-        res = JSON.parse(res)
-        if (res.returnCode == '200') {
-            // console.log(res.data)
-            var temDom = document.getElementsByClassName('tem_contain')[0];
-            temDom.innerHTML = '';
-            var Div1 = document.createElement('div');
-            Div1.className = 'tem_dom';
-            Div1.innerHTML = '<span>站点</span><span>温度</span>';
-            temDom.appendChild(Div1)
-            console.log(temDom)
-            for (let i = 0; i < res.data.length; i++) {
-                // console.log(i)
-                var Div = document.createElement('div');
-                Div.className = 'tem_dom';
-                Div.innerHTML = '<span>' + res.data[i].Station_Name + '</span><span>' + res.data[i].TEM + '°C</span>';
-                temDom.appendChild(Div)
-            }
-        }
-    }, function (error) {
-        console.log(error)
-    })
-}
-getTempData('丹凤县')
 
-// 负氧离子站站点数据获取
-function getNegactive() {
-    Ajax('get', 'http://192.168.1.80:801/noi/getNOIStaionList', {}, function (res) {
-        // console.log(res)
-        res = JSON.parse(res)
-        if (res.returnCode == '200') {
-            console.log(res.data)
-            var radio = document.getElementsByClassName('radioSingle')[0];
-            for (let i = 0; i < res.data.length; i++) {
-                if (i == 0) {
-                    radio.innerHTML += '<input type="radio" name="sex" class="position" lay-skin="primary" title=' + res.data[i].equip_name + ' checked="" sid=' + res.data[i].devid + '><sapn class="layui-icon layui-icon-top address" style="font-size: 0.5rem; " sid=' + res.data[i].devid + '></span>'
-                    // radio.innerHTML +=''
-                    getNegactiveData(res.data[i].devid);
-                    continue
-                }
-                radio.innerHTML += '<input type="radio" name="sex" sid=' + res.data[i].devid + ' lay-skin="primary" title=' + res.data[i].equip_name + ' ><sapn class="layui-icon layui-icon-top address" style="font-size: 0.5rem;" sid=' + res.data[i].devid + '></span>'
-                // radio.innerHTML += ''
-
-            }
-        }
-        var baseDom = document.getElementsByClassName("negative")[0];
-        // var address =document.getElementsByClassName("address")[0];
-        $('.address').on('click',function(){
-            
-            getposition($(this).attr('sid'))
-            
-            
-        })
-        
-        baseDom.addEventListener('click', function (e) {
-            var checkDom = document.getElementsByClassName('layui-form-radioed')[0];
-            // console.log(checkDom.previousSibling.getAttribute('sid'))
-            // Ajax('get', 'http://192.168.1.80:801/noi/getNOIStationDetail', {
-            //     'devid': checkDom.previousSibling.getAttribute('sid')
-            // }, function (res) {
-            //     res = JSON.parse(res);
-            //     console.log(res)
-            // })
-            getNegactiveData(checkDom.previousSibling.getAttribute('sid'))
-        })
-    }, function (error) {
-
-    })
-
-}
-getNegactive()
 
 function getposition(data) {
-    Ajax('get', 'http://192.168.1.80:801/noi/getNOIStationDetail', {
+    Ajax('get', s + 'noi/getNOIStationDetail', {
         'devId': data
     }, function (res) {
         res = JSON.parse(res);
-        
+
         var data = res.data[0]
-        var saveStaionlon=data.Lon
-        var saveStaionLat=data.Lat
+        var saveStaionlon = data.Lon
+        var saveStaionLat = data.Lat
         viewer.camera.flyTo({
-            destination : Cesium.Cartesian3.fromDegrees(saveStaionlon, saveStaionLat,1000000)
+            destination: Cesium.Cartesian3.fromDegrees(saveStaionlon, saveStaionLat, 1000000)
             // orientation : {
             //     heading: Cesium.Math.toRadians(20.0), // 方向
             //     pitch: Cesium.Math.toRadians(-90.0), // 倾斜角度
             //     roll: 0
             // }
         });
-   
+
     })
 }
-function getNegactiveData(data) {
-    Ajax('get', 'http://192.168.1.80:801/noi/getNOIStationDetail', {
-        'devId': data
-    }, function (res) {
-        res = JSON.parse(res);
-        // console.log(res.data)
-        var data = res.data[0]
-        var arr = [
-            data.TEM != null ? data.TEM : 0,
-            data.PRS != null ? data.PRS : 0,
-            data.WIN_D_Avg_10mi != null ? data.WIN_D_Avg_10mi : 0,
-            data.WIN_S_Avg_10mi != null ? data.WIN_S_Avg_10mi : 0,
-            data.RHU != null ? data.RHU : 0,
-            data.PM2_5 != null ? data.PM2_5 : 0,
-            data.PM10 != null ? data.PM10 : 0,
-            data.CO2 != null ? data.CO2 : 0,
-            data.NOI != null ? data.NOI : 0,
-        ]
-        option2.series[0].data = arr;
-        myChart2.setOption(option2)
-        // console.log(myChart2)
-    })
-}
+
+
+var time = new Date();
+var y = time.getFullYear();
+var m = time.getMonth() + 1;
+var d = time.getDate();
+document.getElementById('nowTime').innerText = y + '-' + m + '-' + d
+console.log(y, m, d);
+
+//勾选框样式

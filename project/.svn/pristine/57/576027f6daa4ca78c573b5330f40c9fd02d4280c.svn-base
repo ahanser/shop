@@ -1,0 +1,570 @@
+html,
+body,
+#cesiumContainer {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+
+.cesium-viewer-bottom {
+    display: none !important;
+}
+
+#echarts,
+#leftBox,
+#rightBox {
+    position: absolute;
+    top: 0;
+    color: white;
+    font-size: 1.2rem;
+}
+
+#echarts {
+    right: 1rem;
+    width: 35rem;
+    height: 100%;
+    /* display: none */
+    /* border: 1px solid lightskyblue */
+}
+
+#leftBox {
+    left: 1.5rem;
+    width: 30rem;
+    top: 5rem;
+    height: calc(100% - 6rem);
+    /* border: 1px solid blue;  */
+}
+
+#rightBox {
+    right: 1.5rem;
+    width: 30rem;
+    top: 5rem;
+    height: calc(100% - 6rem);
+}
+
+#leftTree {
+    /* left: 1.5rem; */
+    width: 100%;
+    /* top: 6rem; */
+    height: 30%;
+    /* border: 1px solid blue; */
+}
+
+#echarts1,
+#echarts2,
+#echarts3 {
+    width: 100%;
+    height: 40%;
+    /* padding: 1rem; */
+    border: 1px solid #1d3d9c;
+    background: #1d3d9c82;
+    margin-bottom: 1rem;
+    /* opacity: 0.5; */
+}
+
+/* #echarts2{
+    height: 30%;
+} */
+
+.title {
+    font-size: 2.5rem;
+    color: white;
+    position: absolute;
+    top: 0.8rem;
+    width: 100%;
+    z-index: 100;
+    text-align: center;
+    /* font-weight: 500; */
+    letter-spacing: 2px;
+    height: 3.5rem;
+
+}
+
+.box_title {
+    width: 40%;
+    text-align: center;
+    /* padding: 1rem; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* background: #132047; */
+    color: #BFCDEF;
+    background: url('../img/311.png') 0 0 no-repeat;
+    background-size: 100% 100%;
+    height: 2.8rem;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.box_contain {
+    /* border: 1px solid red; */
+    height: calc(100% - 3.2rem);
+    padding: 0.5rem 0.8rem;
+    margin-top: 0.5rem;
+    box-sizing: border-box;
+    font-size: 1rem;
+    background: url('../img/box_bg2.png') 0 0 no-repeat;
+    background-size: 100% 100%;
+    background-color: rgba(8, 17, 42, 0.7);
+    position: relative;
+}
+
+/* 公共样式 */
+.featureSelec {
+    display: flex;
+    justify-content: flex-start;
+    font-size: 0.8rem;
+    color: #3EC4F0;
+    align-items: flex-start;
+}
+
+.featureSelec_1 {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-right: 0.5rem;
+    margin-top: 0.4rem;
+    width: 68px;
+}
+
+.featureSelec_2 {
+    /* margin-top: 10px; */
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 84%;
+    flex-flow: wrap;
+
+}
+
+.featureSelec_2 li {
+    border: 1px solid #2D8CBB;
+    background: #102C6A;
+    padding: 0.4rem 0.5rem;
+    color: white;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    margin-right: 3px;
+    margin-bottom: 0.5rem;
+
+
+}
+
+.factSelect {
+
+    background: url('../img/box_bg5.png') 0 0 no-repeat;
+    background-size: 100% 100%;
+    padding:0.5rem 1rem;
+    box-sizing: border-box;
+    margin-top: 1rem;
+    /* background-color: rgba(8, 17, 42, 0.7); */
+    padding-bottom: 2rem;
+}
+
+.blueChose {
+    color: #3097C0 !important;
+}
+
+.factorChose {
+    background: #FED037 !important;
+    border-color: #FED037 !important;
+    color: #091331 !important;
+}
+
+.Collapse {
+    position: absolute;
+    top: -2.1rem;
+    right: 0;
+    width: 5rem;
+    height: 2rem;
+    display: flex;
+    border-radius: 5px;
+    justify-content: space-around;
+    align-items: center;
+    border: 1px solid rgb(17, 78, 123);
+}
+
+.Collapse1 {
+    position: absolute;
+    top: -2.1rem;
+    left: 0;
+    width: 5rem;
+    height: 2rem;
+    display: flex;
+    border-radius: 5px;
+    justify-content: space-around;
+    align-items: center;
+    border: 1px solid rgb(17, 78, 123);
+}
+
+
+/* 省市区 */
+.contain_title {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    border-bottom: 1px solid #FED037;
+    margin-top: 0.5rem;
+
+
+}
+
+.city_ {
+    color: white;
+    border: 1px solid #256D95;
+    border-bottom: none;
+    padding: 0.3rem 1.5rem;
+    border-radius: 5px 5px 0 0;
+    margin-right: 0.4rem;
+    font-size: 0.8rem;
+    position: relative;
+    text-overflow: ellipsis;
+    /* 超出部分显示省略号 */
+    white-space: nowrap;
+    /*规定段落中的文本不进行换行 */
+    max-width: 25%;
+    /*需要配合宽度来使用*/
+}
+
+.hide_contain {
+    display: none;
+    padding: 1rem 0;
+    padding-top: 0.5rem;
+}
+
+.hide_contain div {
+    display: flex;
+    justify-content: flex-start;
+    margin: 0.8rem 0;
+    padding: 0.3rem 1rem;
+    background: #132449;
+    width: 100%;
+    box-sizing: border-box
+}
+
+.hide_contain div span {
+    display: inline-block;
+    min-width: 20%;
+    text-align: center;
+    color: white;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.hide_contain div span:hover {
+    color: #3097C0;
+}
+
+.show_contain {
+    display: block;
+}
+
+.choseCity {
+    border: 1px solid transparent;
+    border-bottom: none;
+}
+
+.choseCity:after {
+    position: absolute;
+    left: 0;
+    top: 0;
+    content: '';
+    width: 100%;
+    height: calc(100% + 1px);
+    border-width: 1px;
+    border-style: solid;
+    border-color: #FED037;
+    border-bottom-color: #050304;
+    border-radius: 2px 2px 0 0;
+    box-sizing: border-box;
+    pointer-events: none;
+}
+
+/* 气温统计 */
+.temSum {
+    width: 100%;
+    height: 30%;
+    position: absolute;
+    top: 0;
+    right: 0;
+    /* border: 1px solid blueviolet; */
+}
+
+.tem_title {
+    width: 100%;
+    padding: 0 2%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: #3EC4F0;
+    height: 2rem;
+}
+
+.tem_contain {
+    height: calc(100% - 2rem);
+    overflow: auto;
+}
+
+.tem_contain::-webkit-scrollbar {
+    /*滚动条整体样式*/
+    width: 5px;
+    /*高宽分别对应横竖滚动条的尺寸*/
+    height: 1px;
+}
+
+.tem_contain::-webkit-scrollbar-thumb {
+    /*滚动条里面小方块*/
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    background: #535353;
+}
+
+.tem_contain::-webkit-scrollbar-track {
+    /*滚动条里面轨道*/
+    -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    background: #132449;
+}
+
+.tem_btn {
+    padding: 0.2rem 0.3rem;
+    background: #102C6A;
+    border: 1px solid #246EA6;
+    border-radius: 5px;
+    color: white;
+}
+
+.tem_dom {
+    display: flex;
+    justify-content: space-around;
+    margin: 0.8rem 0;
+    padding: 0.3rem 1.5rem;
+    background: #132449;
+    width: 100%;
+    box-sizing: border-box;
+    flex-flow: nowrap;
+}
+
+.tem_dom span {
+    display: inline-block;
+    width: 50%;
+    text-align: center;
+}
+
+/* 负氧离子站 */
+.station {
+    margin-top: 3%;
+    width: 100%;
+    height: 30%;
+    position: absolute;
+    top: 30%;
+    right: 0;
+    /* border: 1px solid yellow; */
+}
+
+.station #oxygenEcharts {
+    width: 100%;
+    height: 100%;
+}
+
+/* 雨量流量关系图 */
+.rain {
+    width: 200%;
+    position: absolute;
+    top: 65%;
+    right: 0;
+    height: 30%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+}
+
+.rain .box_title {
+
+    width: 2.8rem;
+    margin-right: 3%;
+    height: 90%;
+    /* font-size: 1.2rem; */
+    background: url('../img/312.png') 0 0 no-repeat;
+    background-size: 100% 100%;
+    padding: 2rem 0.5rem;
+
+}
+
+.rain .box_contain {
+    width: calc(97% - 2.8rem);
+    height: 100%;
+    margin-top: 0px;
+}
+
+.rain #rain_echart {
+    width: 100%;
+    height: 100%;
+}
+
+/* 基本 */
+.baseMeta {
+    margin-top: 3%;
+    width: 100%;
+    /* height: 15%; */
+
+    /* border: 1px solid yellow; */
+}
+
+.baseMeta .box_contain {
+    padding-top: 3%;
+    background: url('../img/box_bg2.png') 0 0 no-repeat;
+    background-size: 100% 100%;
+}
+
+/* 农业生态要素 */
+.farm {
+    margin-top: 3%;
+    width: 100%;
+    /* height: 13%; */
+    /* border: 1px solid yellow; */
+}
+
+.farm_ .featureSelec_2 {
+    justify-content: flex-start;
+
+}
+
+.farm_ .featureSelec_2 li {
+    margin-right: 5px;
+}
+
+.farm .box_contain {
+    padding-top: 1rem;
+    background: url('../img/box_bg2.png') 0 0 no-repeat;
+    background-size: 100% 100%;
+}
+
+/* 空气环境因子 */
+.air {
+    margin-top: 3%;
+    width: 100%;
+    /* height: 20%; */
+    /* border: 1px solid orange; */
+}
+
+.air .box_contain {
+    padding-top: 1rem;
+    background: url('../img/box_bg2.png') 0 0 no-repeat;
+    background-size: 100% 100%;
+}
+
+.air .featureSelec_2 {
+    justify-content: flex-start;
+
+}
+
+.air .featureSelec_2 li {
+    margin-right: 5px;
+}
+
+/* 地图图标选择展示控件 */
+.cmissChose,
+.negative {
+    margin-top: 3%;
+    background: url('../img/box_bg2.png') 0 0 no-repeat;
+    background-size: 100% 100%;
+    background-color: rgba(8, 17, 42, 0.7);
+    padding: 0.5rem 1rem;
+    width: 100%;
+    box-sizing: border-box;
+
+
+}
+
+.layui-form-item {
+    margin-bottom: 0px;
+}
+
+.layui-input-block {
+    margin-left: 0px;
+    display: flex;
+    justify-content: flex-start;
+    flex-flow: wrap;
+}
+
+.layui-icon-ok:before {
+    color: white;
+    content: ''
+}
+
+.layui-form-checkbox[lay-skin=primary]
+ {
+    width: 25%;
+}
+.layui-form-radio{
+    margin: 0px;
+    width: 47%;
+    line-height: 25px;
+    
+}
+
+.layui-form-checked[lay-skin=primary] .layui-icon-ok:before {
+    color: #2D8CBB;
+    content: "\e605"
+}
+
+.layui-form-checked[lay-skin=primary] i {
+    border-color: #2D8CBB;
+    background-color: #2D8CBB;
+}
+.layui-form-radio>i:hover, .layui-form-radioed>i{
+    color: #2D8CBB;
+}
+
+.layui-form-checkbox[lay-skin=primary] span {
+    color: white;
+}
+
+.layui-form-checked[lay-skin=primary] span,.layui-form-radioed div {
+    color: #2D8CBB
+}
+
+
+.layui-form-checkbox[lay-skin=primary]:hover i {
+    border-color: #2D8CBB !important;
+}
+
+.layui-form-checkbox[lay-skin=primary] i {
+    background-color: transparent;
+}
+
+/* 菜单logo */
+.menuLogo {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    height: 4.5rem;
+    width: 4.5rem;
+    background: url('../img/menu.png') 0 0 no-repeat;
+    background-size: 100% 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 1rem;
+    z-index: 100;
+    /* opacity: 0; */
+
+}
+
+/* 地球信息框 */
+.myWindow {
+    width: 30.5rem;
+    height: 16.4rem;
+    background: url('../img/box_bg2.png') 0 0 no-repeat;
+    background-color: rgba(8, 17, 42, 0.7);
+    background-size: 100% 100%;
+}
