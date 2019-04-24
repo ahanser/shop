@@ -94,10 +94,6 @@ function getget(type, areaname, flag) {
 
             var pageCount = resData.data.length;
             var pageSize = 8;
-
-            var toatl = parseInt(pageSize * pageNum)
-
-
             if (pageCount <= pageSize) {
                 totalNum = 1
             } else {
@@ -158,90 +154,106 @@ $('.featureSelec_2').on('contextmenu', 'li', function (ev) {
     evItem = ev
     dataTypeInfo.style.left = x + 'px';
     dataTypeInfo.style.top = Y + 'px';
+    item = evItem.target.innerText;
 })
+//要素右键菜单事件
+
+
 function dataShow() {
-    var item = evItem.target.innerText;
-    var feature
-    switch (item) {
-        case '温度':
-            feature = 'TEM';
-            break;
-
-        case '雨量':
-            feature = 'PRE_1h';
-            break;
-        case '气压':
-            feature = 'PRS';
-            break;
-        case '风向':
-            feature = 'WIN_D_Avg_10mi';
-            break;
-        case '风速':
-            feature = 'WIN_S_Avg_10mi';
-            break;
-        case '相对湿度':
-            feature = 'RHU';
-            break;
-        case '能见度':
-            feature = 'VIS_HOR_10MI';
-            break;
-        case 'PM2.5浓度':
-            feature = 'pm2_5';
-            break;
-        case 'PM10浓度':
-            feature = 'PM10';
-            break;
-        case '负氧离子':
-            feature = 'NOI';
-            break;
-        case '二氧化碳':
-            feature = 'CO2';
-            break;
-        case '土壤相对湿度(多层)':
-            feature = 'SRHU';
-            break;
-        case '光照时长':
-            feature = 'SSH';
-            break;
-
-        default:
-            break;
-    }
+    getStaionLat()
+}
+function getStaionLat() {
+    // http://192.168.1.80:801/feature/getStationList?types=负氧离子
+    var feature;
+        switch (item) {
+            case '温度':
+                feature = 'TEM';
+                break;
+            case '雨量':
+                feature = 'PRE_1h';
+                break;
+            case '气压':
+                feature = 'PRS';
+                break;
+            case '风向':
+                feature = 'WIN_D_Avg_10mi';
+                break;
+            case '风速':
+                feature = 'WIN_S_Avg_10mi';
+                break;
+            case '相对湿度':
+                feature = 'RHU';
+                break;
+            case '能见度':
+                feature = 'VIS_HOR_10MI';
+                break;
+            case '土壤相对湿度(多层)':
+                feature = 'SRHU';
+                break;
+            case '光照时长':
+                feature = 'SSH';
+                break;
+            case '二氧化碳':
+                feature = 'CO2';
+                break;
+            case '负氧离子':
+                feature = 'NOI';
+                break;
+            case 'PM2.5浓度':
+                feature = 'pm2_5';
+                break;
+            case 'PM10浓度':
+                feature = 'PM10';
+                break;              
+            default:
+                break;
+        }
     var sendData = {
         feature: feature
     }
-    Ajax('get', s + 'feature/getStationList', sendData, function (res) {
+    Ajax('get', s+'feature/getStationList', sendData, function (res) {
         viewer.entities.removeAll();
         saveStationMap.clear();
+        idArr=[];
         res = JSON.parse(res)
         if (res.returnCode == 200) {
             // console.log(res.data)
-            
+            saveStation = res.data
             console.log(saveStation);
-            var arry = [];
-
-
+            
             for (let i = 0; i < res.data.length; i++) {
                 addPoint(res.data[i])
-                if (saveStationMap.has(res.data[i].TYPE)) {
-                    var temp = saveStationMap.get(res.data[i].TYPE);
+                if (saveStationMap.has(saveStation[i].TYPE)) {
+                    var temp = saveStationMap.get(saveStation[i].TYPE);
                     temp.push(res.data[i]);
                 }
                 else {
                     var arry = [];
                     arry.push(res.data[i]);
-                    saveStationMap.set(res.data[i].TYPE, arry);
+                    saveStationMap.set(saveStation[i].TYPE, arry);
                 }
             }
             // console.log(viewer.entities)
         }
+        $.getJSON("./json/zhuantitu.json", function (data) {
+            for (var val of data) {
+                addPoint(val)
+                if (saveStationMap.has(val.TYPE)) {
+                    var temp = saveStationMap.get(val.TYPE);
+                    temp.push(val);
+                }
+                else {
+                    var arry = [];
+                    arry.push(val);
+                    saveStationMap.set(val.TYPE, arry);
+                }
+            }
+        })
     }, function (error) {
         console.log(error);
     })
-    getStaionLat()
-
+   
 }
-
 
 
 

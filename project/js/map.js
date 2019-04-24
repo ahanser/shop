@@ -1,5 +1,6 @@
 var dataMock1 =false;
 var satelliteParam;
+var showNum;
 var s='http://192.168.1.80:801/'
 // var url = "http://192.168.5.36:8857/tile/service/v1/tile?map=2&x={x}&y={y}&z={z}";
 // new Cesium.UrlTemplateImageryProvider({url:url}),
@@ -134,7 +135,8 @@ function ContorlLabelShow_Hide() {
                 var lev = stationLev.get(temp[0]);
                 if (lev != null && lev != undefined)
                     var num = ReturnBumber(height, lev)
-                 console.log(num)
+                    showNum=num
+                //  console.log(num)
                 if (seldata != null && seldata != undefined) {
                     seldata.forEach(function (element, index, array) {
                         if (index != undefined) {
@@ -154,8 +156,12 @@ function ContorlLabelShow_Hide() {
 
 }
 
-var arcgisNoteLayerProvider = new Cesium.ArcGisMapServerImageryProvider({
-    url: s+'arcgis/rest/services/layer/qinling/MapServer'
+// var arcgisNoteLayerProvider = new Cesium.ArcGisMapServerImageryProvider({
+//     url: s+'arcgis/rest/services/layer/qinling/MapServer'
+// });
+
+var arcgisNoteLayerProvider = new Cesium.UrlTemplateImageryProvider({
+    url: 'http://192.168.1.80:8857/tile/service/v1/tile?map=3&x={x}&y={y}&z={z}'
 });
 //----------------------------------多图层控制
 var imageryLayers = viewer.imageryLayers;
@@ -199,78 +205,7 @@ $.getJSON("./json/zhuantitu.json", function (data) {
         }
     }
 })
-function getStaionLat() {
-    // http://192.168.1.80:801/feature/getStationList?types=负氧离子
-    var factorChose = document.getElementsByClassName('factorChose');
-    var feature;
-    for (let i = 0; i < factorChose.length; i++) {
-        switch (factorChose[i].innerText) {
-            case '温度':
-                feature = 'TEM';
-                break;
 
-            case '雨量':
-                feature = 'PRE_1h';
-                break;
-            case '气压':
-                feature = 'PRS';
-                break;
-            case '风向':
-                feature = 'WIN_D_Avg_10mi';
-                break;
-            case '风速':
-                feature = 'WIN_S_Avg_10mi';
-                break;
-            case '相对湿度':
-                feature = 'RHU';
-                break;
-            case '能见度':
-                feature = 'VIS_HOR_10MI';
-                break;
-            case '土壤相对湿度(多层)':
-                feature = 'SRHU';
-                break;
-            case '光照时长':
-                feature = 'SSH';
-                break;
-
-            default:
-                break;
-        }
-        if(feature){
-            break;
-        }
-    }
-    
-    var sendData = {
-        feature: feature
-    }
-    Ajax('get', s+'feature/getStationList', sendData, function (res) {
-  
-        res = JSON.parse(res)
-        if (res.returnCode == 200) {
-            // console.log(res.data)
-            saveStation = res.data
-            console.log(saveStation);
-            
-            for (let i = 0; i < res.data.length; i++) {
-                addPoint(res.data[i])
-                if (saveStationMap.has(saveStation[i].TYPE)) {
-                    var temp = saveStationMap.get(saveStation[i].TYPE);
-                    temp.push(res.data[i]);
-                }
-                else {
-                    var arry = [];
-                    arry.push(res.data[i]);
-                    saveStationMap.set(saveStation[i].TYPE, arry);
-                }
-            }
-            // console.log(viewer.entities)
-        }
-    }, function (error) {
-        console.log(error);
-    })
-}
 //getStaionLat()
 
 
@@ -281,13 +216,19 @@ function  upDate(item)
 }
 function addPoint(data) {
     var showtext;
+    var showTure;
     var guid = data['guid'] = Cesium.createGuid();
     idArr.push(guid)
     if(data.TYPE == '专题图'){
         showtext =data.Station_Name;
     }else{
-
         showtext =data.Station_Name + "  " +data.RESULT;
+    }
+    if(showNum>=4){
+		console.log("TCL: addPoint -> showNum", showNum)
+        showTure=false;
+    }else if(showNum=3){
+        showTure=true;
     }
     viewer.entities.add({
         id: guid,
@@ -322,7 +263,7 @@ function addPoint(data) {
        
         label: {
             text:showtext,
-            font : '12pt sans-serif',
+            font : '10pt sans-serif',
             color: Cesium.Color.RED,
             style: Cesium.LabelStyle.FILL_AND_OUTLINE,
             heightReference : Cesium.HeightReference.CLAMP_TO_GROUND,
@@ -331,6 +272,7 @@ function addPoint(data) {
             outlineWidth: 1,
             outlineColor :Cesium.Color.BLACK,
             outlineWidth :3.0,
+            show:showTure,
             //垂直位置
             //verticalOrigin : Cesium.VerticalOrigin.BUTTON,
             //中心位置
@@ -407,26 +349,8 @@ handler.setInputAction(function (movement) {
             myWindow = document.createElement('div');
             myWindow.className = 'myWindow'
             //弹窗样式设置
-
-            myWindow.innerHTML = `
-                    <div class="address_info">
-                    <p>地理位置：${saveStation[i].Province + saveStation[i].City + saveStation[i].Cnty}</p>
-                    <p>站点类型：${saveStation[i].TYPE}</p>
-                    <p>站点ID：${saveStation[i].Station_Id_C}</p>
-                    <p>经度：${saveStation[i].Lon}</p>
-                    <p>纬度：${saveStation[i].Lat}</p>
-                    <p>时间: ${saveStation[i].Datetime}</p>
-                    <p>温度：${saveStation[i].TEM}</p>
-                    <p>10分钟平均水平能见度：${saveStation[i].VIS_HOR_10MI}</p>
-                    <p>过去一小时降水量：${saveStation[i].PRE_1h}</p>
-                    <p>相对湿度：${saveStation[i].RHU}</p>
-                    <p>气压：${(saveStation[i].PRS == null ? '暂无数据' : saveStation[i].PRS)}</p>
-                    <p>10分钟平均风向：${(saveStation[i].WIN_D_Avg_10mi == null ? '暂无数据' : saveStation[i].WIN_D_Avg_10mi)}</p>
-                    <p>10分钟平均风速：${(saveStation[i].WIN_S_Avg_10mi == null ? '暂无数据' : saveStation[i].WIN_S_Avg_10mi)}</p>
-                    <p>负氧离子：${(saveStation[i].NOI == null ? '暂无数据' : saveStation[i].NOI)}</p>
-                    <p>二氧化碳：${(saveStation[i].CO2 == null ? '暂无数据' : saveStation[i].CO2)}</p>
-                    <p>PM25：${(saveStation[i].PM25 == null ? '暂无数据' : saveStation[i].PM25)}</p>
-                    </div>`;
+            console.log(i)
+    
             //专题图 切换成轮播图
             if (pick.id._name == '专题图') {
                 console.log(pick.id);
@@ -447,9 +371,6 @@ handler.setInputAction(function (movement) {
                 text += '<div class="swiper-button-prev swiper-button-white"></div>'
                 text += '<div class="swiper-button-next swiper-button-white"></div>'
                 text += '</div>'
-              
-
-
                 //swipe 初始化
                 function getswipe() {
                     var mySwiper = new Swiper('.swiper-container', {
@@ -459,10 +380,29 @@ handler.setInputAction(function (movement) {
                         observeParents: true,
                         loop: true,
                         autoplayDisableOnInteraction: false,
-
                         autoplay: 1000,//可选选项，自动滑动
                     })
                 }
+            }else{
+                myWindow.innerHTML = `
+                <div class="address_info">
+                <p>地理位置：${saveStation[i].Province + saveStation[i].City + saveStation[i].Cnty}</p>
+                <p>站点类型：${saveStation[i].TYPE}</p>
+                <p>站点ID：${saveStation[i].Station_Id_C}</p>
+                <p>经度：${saveStation[i].Lon}</p>
+                <p>纬度：${saveStation[i].Lat}</p>
+                <p>时间: ${saveStation[i].Datetime}</p>
+                <p>温度：${saveStation[i].TEM}</p>
+                <p>10分钟平均水平能见度：${saveStation[i].VIS_HOR_10MI}</p>
+                <p>过去一小时降水量：${saveStation[i].PRE_1h}</p>
+                <p>相对湿度：${saveStation[i].RHU}</p>
+                <p>气压：${(saveStation[i].PRS == null ? '暂无数据' : saveStation[i].PRS)}</p>
+                <p>10分钟平均风向：${(saveStation[i].WIN_D_Avg_10mi == null ? '暂无数据' : saveStation[i].WIN_D_Avg_10mi)}</p>
+                <p>10分钟平均风速：${(saveStation[i].WIN_S_Avg_10mi == null ? '暂无数据' : saveStation[i].WIN_S_Avg_10mi)}</p>
+                <p>负氧离子：${(saveStation[i].NOI == null ? '暂无数据' : saveStation[i].NOI)}</p>
+                <p>二氧化碳：${(saveStation[i].CO2 == null ? '暂无数据' : saveStation[i].CO2)}</p>
+                <p>PM25：${(saveStation[i].PM25 == null ? '暂无数据' : saveStation[i].PM25)}</p>
+                </div>`;
             }
 
             myWindow.style.position = 'absolute';
@@ -582,7 +522,7 @@ function CalDistance(item, index, num, lev) {
     height = Math.ceil(viewer.camera.positionCartographic.height);
     var dis = Cesium.Cartesian3.distance(cartesian, cartesian3);
     var obj = viewer.entities.getById(item.guid);
-    var number = lev.number[num]  
+    // var number = lev.number[num]  
     if(num >=4)
     {
         if(obj._name=='地面站'){
