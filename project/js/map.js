@@ -1,6 +1,6 @@
 var dataMock1 =false;
 var satelliteParam;
-var showNum;
+var showNum = 10;
 var s='http://192.168.1.80:801/'
 // var url = "http://192.168.5.36:8857/tile/service/v1/tile?map=2&x={x}&y={y}&z={z}";
 // new Cesium.UrlTemplateImageryProvider({url:url}),
@@ -28,6 +28,35 @@ var viewer = new Cesium.Viewer('cesiumContainer', {
     
     });
 
+var dataSourcesMap = new Map();
+
+var dimianDataSource = new Cesium.CustomDataSource('地面站');
+var guganDataSource = new Cesium.CustomDataSource('骨干站');
+guganDataSource.entities.show = false;
+var quyuDataSource = new Cesium.CustomDataSource('区域站');
+quyuDataSource.entities.show = false;
+var noiDataSource = new Cesium.CustomDataSource('负氧离子');
+noiDataSource.entities.show = false;
+var quncequnfangDataSource = new Cesium.CustomDataSource('群测群防点');
+quncequnfangDataSource.entities.show = false;
+var zhuantiDataSource = new Cesium.CustomDataSource('专题图');
+zhuantiDataSource.entities.show = false;
+viewer.dataSources.add(dimianDataSource);
+viewer.dataSources.add(guganDataSource);
+viewer.dataSources.add(quyuDataSource);
+viewer.dataSources.add(noiDataSource);
+viewer.dataSources.add(quncequnfangDataSource);
+viewer.dataSources.add(zhuantiDataSource);
+
+dataSourcesMap.set('地面站', dimianDataSource);
+dataSourcesMap.set('骨干站', guganDataSource);
+dataSourcesMap.set('区域站', quyuDataSource);
+dataSourcesMap.set('负氧离子', noiDataSource);
+dataSourcesMap.set('群测群防点', quncequnfangDataSource);
+dataSourcesMap.set('专题图', zhuantiDataSource);
+
+console.log(dataSourcesMap)
+
 viewer.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(116.435314, 39.960521, 30000000.0), // 设置位置
 
@@ -37,7 +66,6 @@ viewer.camera.flyTo({
         roll: 0
     }
 });
-
 
 
 
@@ -126,6 +154,7 @@ function ContorlLabelShow_Hide() {
 
 
     handler.setInputAction(function (movement) {
+        // console.log(this)
         height = Math.ceil(viewer.camera.positionCartographic.height);
    // if(dataMock1==true)
     {
@@ -154,6 +183,26 @@ function ContorlLabelShow_Hide() {
     
     }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
+    //滚轮层级事件
+    handler.setInputAction(function(wheelment){
+        var lev = stationLev.get('地面站');
+        height = Math.ceil(viewer.camera.positionCartographic.height);
+        // if(dataMock1==true)
+        showNum = ReturnBumber(height,lev);
+        var showFlag = showNum>=4?false:true;
+        
+        dataSourcesMap.forEach(function (value, key, map) {
+            var entityArr = value.entities.values;
+            for(var index in entityArr){
+                entityArr[index].label.show = showFlag;
+            };
+         })
+        
+         
+    },Cesium.ScreenSpaceEventType.WHEEL);
+
+
+
 }
 
 // var arcgisNoteLayerProvider = new Cesium.ArcGisMapServerImageryProvider({
@@ -180,6 +229,8 @@ stationSelMap.set('区域站', false);
 stationSelMap.set('负氧离子', false);
 stationSelMap.set('专题图', false);
 stationSelMap.set('群测群防点', false);
+
+
 
 $.getJSON("./json/Level.json", function (data) {
     console.log(data);
@@ -208,34 +259,44 @@ $.getJSON("./json/zhuantitu.json", function (data) {
 
 //getStaionLat()
 
-
+var showTure;
 function  upDate(item)
 {   
     var obj = viewer.entities.getById(item.guid);
-    obj.label.text = data.Station_Name + "  " +data.item
+    obj.label.show = showTure
 }
 function addPoint(data) {
     var showtext;
-    var showTure;
+    var entityCollection;
     var guid = data['guid'] = Cesium.createGuid();
     idArr.push(guid)
-    if(data.TYPE == '专题图'){
-        showtext =data.Station_Name;
-    }else{
-        showtext =data.Station_Name + "  " +data.RESULT;
+    showtext =data.Station_Name + "  " +data.RESULT;
+    if(data.TYPE == '地面站'){
+        entityCollection = dimianDataSource;
+    }else if(data.TYPE == '骨干站'){
+        entityCollection = guganDataSource;
+    }else if(data.TYPE == '区域站'){
+        entityCollection = quyuDataSource;
+    }else if(data.TYPE == '负氧离子'){
+        entityCollection = noiDataSource;
+    }else if(data.TYPE == '群测群防点'){
+        entityCollection = quncequnfangDataSource;
+    }else if(data.TYPE == '专题图'){
+        entityCollection = zhuantiDataSource;
+        showtext =data.Station_Name; 
     }
+
     if(showNum>=4){
-		console.log("TCL: addPoint -> showNum", showNum)
         showTure=false;
-    }else if(showNum=3){
+    }else{
         showTure=true;
     }
-    viewer.entities.add({
+    entityCollection.entities.add({
         id: guid,
         name: data.TYPE,
         
         position: Cesium.Cartesian3.fromDegrees(data.Lon, data.Lat),
-        show: data.TYPE == '地面站' ? true : false,
+        show: true,
         //点样式
         // point: {
         //     pixelSize: 5,
@@ -272,7 +333,7 @@ function addPoint(data) {
             outlineWidth: 1,
             outlineColor :Cesium.Color.BLACK,
             outlineWidth :3.0,
-            show:showTure,
+            show: showTure,
             //垂直位置
             //verticalOrigin : Cesium.VerticalOrigin.BUTTON,
             //中心位置
@@ -309,25 +370,28 @@ function stationClick() {
 
     var baseDom = document.getElementsByClassName("cmissChose")[0];
     baseDom.addEventListener('click', function (e) {
-
         stationSelMap.forEach(function (element, index, array) {
             array.set(index,false);
         });
 
-         var checkDom=document.getElementsByClassName('layui-form-checked');
+         var checkDom=document.getElementsByClassName('layui-unselect');
          for(let i=0;i<checkDom.length;i++){
-             console.log(checkDom[i].childNodes[0].innerText+i)
+             if(checkDom[i].className.indexOf('layui-form-checked') > -1){
+                dataSourcesMap.get(checkDom[i].childNodes[0].innerText).entities.show = true;
+             }else{
+                dataSourcesMap.get(checkDom[i].childNodes[0].innerText).entities.show = false;
+             }
 
 
-                    stationSelMap.forEach(function (element, index, array) {
-                        if(index==checkDom[i].childNodes[0].innerText)
-                        array.set(index,true);
-                    });
+                    // stationSelMap.forEach(function (element, index, array) {
+                    //     if(index==checkDom[i].childNodes[0].innerText)
+                    //     array.set(index,true);
+                    // });
          }
-            for(let j=0;j<viewer.entities.values.length;j++){                
-                    viewer.entities.values[j].show=stationSelMap.get(viewer.entities.values[j].name);
+            // for(let j=0;j<viewer.entities.values.length;j++){                
+            //         viewer.entities.values[j].show=stationSelMap.get(viewer.entities.values[j].name);
 
-            }
+            // }
 
     })
 
@@ -523,26 +587,26 @@ function CalDistance(item, index, num, lev) {
     var dis = Cesium.Cartesian3.distance(cartesian, cartesian3);
     var obj = viewer.entities.getById(item.guid);
     // var number = lev.number[num]  
-    if(num >=4)
-    {
-        if(obj._name=='地面站'){
-            obj._show = true;
-        }else{
-            obj._show = false;
-        }
-    }else if(num==3){
-        if(item.TYPE=='骨干站'||'地面站'){
-            obj.show = true;
-        }else{
-            obj.show = false;
-        }
-    }else{
-        if(item.TYPE=='骨干站'||'地面站'||'区域站'){
-            obj.show = true;
-        }else{
-            obj.show = false;
-        }
-    }
+    // if(num >=4)
+    // {
+    //     if(obj._name=='地面站'){
+    //         obj._show = true;
+    //     }else{
+    //         obj._show = false;
+    //     }
+    // }else if(num==3){
+    //     if(item.TYPE=='骨干站'||'地面站'){
+    //         obj.show = true;
+    //     }else{
+    //         obj.show = false;
+    //     }
+    // }else{
+    //     if(item.TYPE=='骨干站'||'地面站'||'区域站'){
+    //         obj.show = true;
+    //     }else{
+    //         obj.show = false;
+    //     }
+    // }
 
     
     //  if(obj!=undefined){
@@ -559,9 +623,11 @@ function CalDistance(item, index, num, lev) {
     //             obj.show = false;
     //         }
     //  }
-   
-
-    
-
+    // if(showNum>=4){
+	// 	console.log("TCL: addPoint -> showNum", showNum)
+    //     showTure=false;
+    // }else{
+    //     showTure=true;
+    // }
 
 }

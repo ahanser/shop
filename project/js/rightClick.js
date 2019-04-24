@@ -212,6 +212,9 @@ function getStaionLat() {
         feature: feature
     }
     Ajax('get', s+'feature/getStationList', sendData, function (res) {
+        dataSourcesMap.forEach(function (value, key, map) {
+            value.entities.removeAll();
+         })
         viewer.entities.removeAll();
         saveStationMap.clear();
         idArr=[];
